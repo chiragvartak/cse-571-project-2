@@ -1,6 +1,7 @@
 # from model import Model
 # from pacman import GameState
-from util import euclidean_distance
+from util import euclidean_distance, Counter
+from util import *
 # from typing import List
 
 class FeatureBasedGameState(object):
@@ -24,10 +25,12 @@ class FeatureBasedGameState(object):
         self.ghostNorthEast = None
 
         """FM: Bad set of features, need """
-        self.foodNorth = None
-        self.foodSouth = None
-        self.foodEast = None
-        self.foodWest = None
+        #self.foodNorth = None
+        #self.foodSouth = None
+        #self.foodEast = None
+        #self.foodWest = None
+
+        self.closestFood = None
         """-------------------------------------------------------------------------------------------------------------------------------"""
 
         # Caching some stuff for faster calculations - don't change this please!
@@ -50,10 +53,39 @@ class FeatureBasedGameState(object):
         self.ghostNorthEast = (x + 1, y + 1) in self.rawGameState.getGhostPositions()
 
         """FM: Install manhattan distance/heuristic calculation of closest food pellet here"""
-        self.foodNorth = self.rawGameState.hasFood(x, y + 1)
-        self.foodSouth = self.rawGameState.hasFood(x, y - 1)
-        self.foodEast = self.rawGameState.hasFood(x + 1, y)
-        self.foodWest = self.rawGameState.hasFood(x - 1, y)
+        #self.foodNorth = self.rawGameState.hasFood(x, y + 1)
+        #self.foodSouth = self.rawGameState.hasFood(x, y - 1)
+        #self.foodEast = self.rawGameState.hasFood(x + 1, y)
+        #self.foodWest = self.rawGameState.hasFood(x - 1, y)
+
+        self.closestFood = closestFoodEvalFunction(self.rawGameState)
+
+        """FM: My old eval function from project 2"""
+        def closestFoodEvalFunction(currentGameState):
+            """
+              Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
+              evaluation function (question 5).
+            """
+
+            "*** YOUR CODE HERE ***"
+            # Borrowed and modified given boilerplate variables from Q1 evaluation function
+            pacmanPosition = currentGameState.getPacmanPosition()
+            foodPosition = currentGameState.getFood().asList()
+            foodSum = 0
+
+            # Took the sum of manhattan distances from all remaining food
+            for food in foodPosition:
+                foodSum += manhattanDistance(pacmanPosition, food)
+
+            # Returns if Pacman has eaten ALL food capsules 
+            if foodSum == 0:
+                return currentGameState.getScore()
+
+            # If food still remains on the map, return updated current score
+            else:
+                # (>>>) Converted to float to prevent unnecessary truncation, which caused failing test cases
+                return currentGameState.getScore() + 400.0/foodSum
+
         """-------------------------------------------------------------------------------------------------------------------------------"""
 
     def findClosestGhosts(self):
@@ -102,10 +134,11 @@ class FeatureBasedGameState(object):
                 self.ghostSouthWest,
                 self.ghostSouthEast,
                 self.ghostNorthEast,
-                self.foodNorth,
-                self.foodSouth,
-                self.foodEast,
-                self.foodWest
+                self.closestFood
+                #self.foodNorth,
+                #self.foodSouth,
+                #self.foodEast,
+                #self.foodWest
                 )
     """-------------------------------------------------------------------------------------------------------------------------------"""
 
@@ -130,10 +163,11 @@ class FeatureBasedGameState(object):
             "ghostSouthWest": self.ghostSouthWest,
             "ghostSouthEast": self.ghostSouthEast,
             "ghostNorthEast": self.ghostNorthEast,
-            "foodNorth": self.foodNorth,
-            "foodSouth": self.foodSouth,
-            "foodEast": self.foodEast,
-            "foodWest": self.foodWest
+            "closestFood": self.closestFood
+            #"foodNorth": self.foodNorth,
+            #"foodSouth": self.foodSouth,
+            #"foodEast": self.foodEast,
+            #"foodWest": self.foodWest
         })
     """-------------------------------------------------------------------------------------------------------------------------------"""
 
