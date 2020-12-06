@@ -206,11 +206,43 @@ class PriorityQueueWithFunction(PriorityQueue):
 def manhattanDistance( xy1, xy2 ):
     "Returns the Manhattan distance between points xy1 and xy2"
     return abs( xy1[0] - xy2[0] ) + abs( xy1[1] - xy2[1] )
-    
+
 # Franks: Add function for determining angle from point A to point B
 import math
 def getAngle(A,B, round_to_nearest=45):
     return int(round_to_nearest * round(float(math.degrees(math.atan2(B[1]-A[1], B[0]-A[0])))/round_to_nearest))
+
+def median(some_list):
+    l = len(some_list)
+    some_list.sort()
+    return some_list[l/2]
+
+class TopList(object):
+    """
+    A running list of the greatest values you've seen, in no particular order
+    """
+
+    def __init__(self, max_number_of_elements):
+        self.max_number_of_elements = max_number_of_elements
+        self.topList = []
+
+    def update(self, new_value):
+        if len(self.topList) < self.max_number_of_elements:
+            self.topList.append(new_value)
+        else:
+            # if new_value is greater than the minimum value, do replacement
+            min_value = min(self.topList)
+            replaced = False
+            for i in range(len(self.topList)):
+                if not replaced:
+                    if self.topList[i] == min_value and new_value > min_value:
+                        self.topList[i] = new_value
+                        replaced = True
+    def get_mean(self):
+        return sum(self.topList)/len(self.topList)
+
+    def get_median(self):
+        return median(self.topList)
 
 """
   Data structures and functions useful for various course projects

@@ -1,5 +1,6 @@
 from collections import namedtuple
 from featureBasedGameState import FeatureBasedGameState
+from util import TopList
 
 
 WinTuple = namedtuple('WinTuple', "didWin score")
@@ -15,52 +16,86 @@ class Model(object):
         self.total_simulations = 0
         
         # experimental:
-        self.win_threshold = 460  # idea: moving threshold. When game is over, if the final score > self.win_threshold, count it as a win
+        self.winThreshold = -9999999  # moving threshold. When game is over, if the final score > self.win_threshold, count it as a win
+        self.top_scores = TopList(10)  # keep track of top scores seen. The number of elements in this list indirectly determines your winThreshold and how fast it changes
         self.overall_winTuples = []  # will be a list of one WinTuple per simulation ran
-        self.max_score_so_far = -9999999  # inform your win_threshold based on the max score you've seen so far.
+        self.total_effectiveWins = 0
+        self.total_literalWins = 0
 
     def updateEntry(self, fbgs, actionTaken, didWin, score):
-        # type: (FeatureBasedGameState, str, bool, int) -> None
+        # type: (FeatureBasedGameState, str, bool, float) -> None
         nWins = 0
         nSimulations = 0
         listOfWinTuples = []
 
         if (fbgs, actionTaken) in self.data.keys():
-            # DO NOT GET nWins FROM HERE!!!! RECALCULATE nWins BASED ON self.winThreshold
-            nSimulations = self.data[(fbgs, actionTaken)].nSimulations
-            listOfWinTuples = self.data[(fbgs, actionTaken)].listOfWinTuples
+            entry = self.data[(fbgs, actionTaken)]
+            nWins = entry.nWins
+            nSimulations = entry.nSimulations
+            listOfWinTuples = entry.listOfWinTuples
 
+        # DO NOT UPDATE nWins HERE!!!!!! CALL model.update_nWins_for_all_entries() FROM SOMEWHERE ELSE
         nSimulations += 1  # increment nSimulations, always
-        listOfWinTuples.append(WinTuple(didWin=didWin, score=score))
+        listOfWinTuples.append(WinTuple(didWin=didWin, score=score))  # append your new WinTuple, always
 
         for winTuple in listOfWinTuples:
-            nWins += winTuple.didWin or winTuple.score > self.win_threshold  # count a win either as a literal win, or as a score over the threshold
+            nWins += winTuple.didWin or winTuple.score > self.winThreshold  # count a win either as a literal win, or as a score over the threshold
 
-        self.data[(fbgs, actionTaken)] = ModelEntry(nWins,
+        self.data[(fbgs, actionTaken)] = ModelEntry(nWins=nWins,
                                                     nSimulations=nSimulations,
                                                     listOfWinTuples=listOfWinTuples)
+               
+    def update_nWins_for_all_entries(self):
+        for key in self.data.keys():
+            entry = self.data[key]
+            nWins = 0
+            nSimulations = entry.nSimulations
+            listOfWinTuples = entry.listOfWinTuples
+
+            for winTuple in listOfWinTuples:
+                nWins += winTuple.didWin or winTuple.score >= self.winThreshold  # count a win either as a literal win, or as a score over the threshold
+
+            self.data[key] = ModelEntry(nWins=nWins, nSimulations=nSimulations, listOfWinTuples=listOfWinTuples)
+
+    def update_winThreshold(self, score):
+        # type: float
+
+        # threshold is the average of the top scores seen so far
+        self.top_scores.update(score)
+        self.winThreshold = self.top_scores.get_median()  # guarantees half of the top scores count as effective wins
+        # top_score_mean = self.top_scores.get_mean()
+        # if top_score_mean < 0:
+        #     self.winThreshold = 1.25*top_score_mean
+        # else:
+        #     self.winThreshold = 0.95*top_score_mean
 
     def writeModelToFile(self, file="model.txt"):
         with open(file, 'w') as f:
             f.write("Playing on %s\n" % self.layout)
             f.write("Took %s seconds\n" % self.total_time)
             f.write("Total number of simulations run: %s\n" % self.total_simulations)
-            f.write("Total number of literal wins: %s\n" % self.total_literalWins())
-            f.write("Total number of effective wins: %s\n" % self.total_effectiveWins())
+            f.write("Total number of literal wins: %s\n" % self.total_literalWins)
+            f.write("Total number of effective wins: %s\n" % self.total_effectiveWins)
+            f.write("Final win threshold: %s\n" % self.winThreshold)
+            f.write("Average score: %s\n" % self.get_average_score())
             f.write("Total number of nodes: %s\n\n" % len(self.data))
             for key, value in self.data.items():
                 f.write(str(key) + ": " + str(value) + "\n")
 
-    def total_effectiveWins(self):
+    def get_total_effectiveWins(self):
         nWins = 0
         for winTuple in self.overall_winTuples:
-            nWins += winTuple.score > self.win_threshold
+            nWins += winTuple.didWin or winTuple.score >= self.winThreshold
         return nWins
 
-    def total_literalWins(self):
+    def get_total_literalWins(self):
         nWins = 0
         for winTuple in self.overall_winTuples:
             nWins += winTuple.didWin
         return nWins
+
+    def get_average_score(self):
+        sum_of_scores = sum([winTuple.score for winTuple in self.overall_winTuples])
+        return sum_of_scores/len(self.overall_winTuples)
 
 commonModel = Model()

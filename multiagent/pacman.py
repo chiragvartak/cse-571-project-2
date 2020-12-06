@@ -692,10 +692,18 @@ def updateModel(model, game):
 
     pairFbgsActions = [(FeatureBasedGameState(gameState), move[1]) for move, gameState
                       in zip(game.moveHistory, game.stateHistory) if move[0] == 0]
+    didWin=game.state.isWin()
     score = game.state.getScore()
 
-    model.overall_winTuples.append(WinTuple(didWin=game.state.isWin(), score=score))
+    model.overall_winTuples.append(WinTuple(didWin=didWin, score=score))
     model.total_simulations += 1
+    model.update_winThreshold(score)
+
+    # the following updates to literal and total wins are not necessary for the agent to be successful.
+    # they are, however, useful for debugging.
+    # Probably comment these out unless you really want to see them while you're running, since they are somewhat costly to run
+    model.total_literalWins = model.get_total_literalWins()
+    model.total_effectiveWins = model.get_total_effectiveWins()
 
     updated = set()
     for fbgs, action in pairFbgsActions:
@@ -703,8 +711,10 @@ def updateModel(model, game):
         if (fbgs, action) in updated:
             continue
         
-        model.updateEntry(fbgs, action, game.state.isWin(), score)
+        model.updateEntry(fbgs, action, didWin, score)
         updated.add((fbgs, action))
+
+    model.update_nWins_for_all_entries()
 
 
 if __name__ == '__main__':
