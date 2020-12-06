@@ -6,11 +6,14 @@ ModelEntry = namedtuple('ModelEntry', "nWins nSimulations avgReward")
 class Model(object):
     def __init__(self):
         self.data = {}
+        self.total_simulations = 0
+        self.total_wins = 0
 
     def updateEntry(self, fbgs, actionTaken, nWins, nSimulations, avgReward):
         # type: (FeatureBasedGameState, str, int, int, float) -> None
         self.data[(fbgs, actionTaken)] = ModelEntry(nWins=nWins,
-                                                    nSimulations=nSimulations, avgReward=avgReward)
+                                                    nSimulations=nSimulations,  
+                                                    avgReward=avgReward)
 
     def writeModelToFile(self, file="model.txt"):
         with open(file, 'w') as f:

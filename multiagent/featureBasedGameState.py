@@ -23,6 +23,10 @@ class FeatureBasedGameState(object):
         self.foodSouth = None
         self.foodEast = None
         self.foodWest = None
+        self.canMoveNorth = None
+        self.canMoveWest = None
+        self.canMoveSouth = None
+        self.canMoveEast = None
 
         # Caching some stuff for faster calculations - don't change this please!
         self.closestGhosts = None
@@ -44,6 +48,12 @@ class FeatureBasedGameState(object):
         self.foodSouth = self.rawGameState.hasFood(x, y - 1)
         self.foodEast = self.rawGameState.hasFood(x + 1, y)
         self.foodWest = self.rawGameState.hasFood(x - 1, y)
+
+        # information about legal actions
+        self.canMoveNorth = 'North' in self.rawGameState.getLegalPacmanActions()
+        self.canMoveWest = 'West' in self.rawGameState.getLegalPacmanActions()
+        self.canMoveSouth = 'South' in self.rawGameState.getLegalPacmanActions()
+        self.canMoveEast = 'East' in self.rawGameState.getLegalPacmanActions()
 
 
     def findClosestGhosts(self):
@@ -91,7 +101,11 @@ class FeatureBasedGameState(object):
                 self.foodNorth,
                 self.foodSouth,
                 self.foodEast,
-                self.foodWest
+                self.foodWest,
+                self.canMoveNorth,
+                self.canMoveWest,
+                self.canMoveSouth,
+                self.canMoveEast
                 )
 
     def __hash__(self):
@@ -115,7 +129,11 @@ class FeatureBasedGameState(object):
             "foodNorth": self.foodNorth,
             "foodSouth": self.foodSouth,
             "foodEast": self.foodEast,
-            "foodWest": self.foodWest
+            "foodWest": self.foodWest,
+            "canMoveNorth": self.canMoveNorth,
+            "canMoveWest": self.canMoveWest,
+            "canMoveSouth": self.canMoveSouth,
+            "canMoveEast": self.canMoveEast
         })
 
 

@@ -646,7 +646,11 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             rules.quiet = False
         game = rules.newGame( layout, pacman, ghosts, gameDisplay, beQuiet, catchExceptions)
         game.run()
-        updateModel(commonModel, game)
+        
+        # only update the model during training games
+        if i < numTraining:
+            updateModel(commonModel, game)
+
         if not beQuiet: games.append(game)
 
         if record:
@@ -656,6 +660,9 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             components = {'layout': layout, 'actions': game.moveHistory}
             cPickle.dump(components, f)
             f.close()
+        
+        if (i+1)%10 == 0:
+            sys.stdout.write("\rSimulations completed: %s" % str(i+1))
 
     if (numGames-numTraining) > 0:
         scores = [game.state.getScore() for game in games]
@@ -679,6 +686,10 @@ def updateModel(model, game):
     pairFbgsActions = [(FeatureBasedGameState(gameState), move[1]) for move, gameState
                       in zip(game.moveHistory, game.stateHistory) if move[0] == 0]
     score = game.state.getScore()
+
+    # update running total for entire model
+    model.total_simulations += 1
+    model.total_wins += game.state.isWin()
 
     updated = set()
     for fbgs, action in pairFbgsActions:

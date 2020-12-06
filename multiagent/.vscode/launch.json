@@ -1,0 +1,76 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Small 100",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "100",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallClassic",
+                "-n",
+                "110"
+            ]
+        },
+        {
+            "name": "Small 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Test 500",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "500",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "testClassic",
+                "-n",
+                "510"
+            ]
+        },
+        {
+            "name": "Franks 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "franksClassic",
+                "-n",
+                "1010"
+            ]
+        }
+    ]
+}
