@@ -41,6 +41,9 @@ class MCTSAgent(MultiAgentSearchAgent):
                 # value = model.data[(fbgs, action)].avgReward
             valueActionPairs.append((value, action))
             
+        if sum(valueActionPair[0] for valueActionPair in valueActionPairs) == 0:
+            print("No information... wing it?")
+
         # if there are multiple elements with the max value, pick randomly between them
         return random.choice([
             valueActionPair 

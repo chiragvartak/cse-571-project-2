@@ -5,6 +5,74 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Baby 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "babyClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Open 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "openClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Capsule 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "capsuleClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Survival 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "survival",
+                "-n",
+                "1010"
+            ]
+        },
+        {
             "name": "Small 100",
             "type": "python",
             "request": "launch",
@@ -19,6 +87,23 @@
                 "smallClassic",
                 "-n",
                 "110"
+            ]
+        },
+        {
+            "name": "Small 10000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "10000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallClassic",
+                "-n",
+                "10010"
             ]
         },
         {

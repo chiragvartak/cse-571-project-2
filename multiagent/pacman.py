@@ -535,6 +535,7 @@ def readCommand( argv ):
     if options.fixRandomSeed: random.seed('cs188')
 
     # Choose a layout
+    commonModel.layout = options.layout
     args['layout'] = layout.getLayout( options.layout )
     if args['layout'] == None: raise Exception("The layout " + options.layout + " cannot be found")
 
@@ -664,7 +665,9 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
         if (i+1)%10 == 0:
             sys.stdout.write("\rSimulations completed: %s" % str(i+1))
         
-        if i == numTraining:
+        if i+1 == numTraining:
+            import time
+            commonModel.total_time = time.time() - commonModel.start_time
             print("\n")
 
     if (numGames-numTraining) > 0:
@@ -728,6 +731,7 @@ if __name__ == '__main__':
     > python pacman.py --help
     """
     args = readCommand( sys.argv[1:] ) # Get game components based on input
+    commonModel.start_time = time.time()
     runGames( **args )
 
     # import cProfile
