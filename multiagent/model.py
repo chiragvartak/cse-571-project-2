@@ -26,10 +26,13 @@ class Model(object):
 
 
 def getModel(filename = "model.pkl"):
-    with open(filename, 'rb') as f:
-        data = pickle.load(f)
     model = Model()
-    model.data = data
+    try:
+        with open(filename, 'rb') as f:
+            data = pickle.load(f)
+        model.data = data
+    except:
+        pass
     return model
 
 

@@ -1,0 +1,212 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Half 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "halfClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Baby 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "babyClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Open 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "openClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Capsule 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "capsuleClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Survival 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "survival",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Small 100",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "100",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallClassic",
+                "-n",
+                "110"
+            ]
+        },
+        {
+            "name": "Small 10000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "10000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallClassic",
+                "-n",
+                "10010"
+            ]
+        },
+        {
+            "name": "Small 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Test 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "testClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "MinimaxClassic 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "minimaxClassic",
+                "-n",
+                "1010"
+            ]
+        },
+        {
+            "name": "Franks 100",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "100",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "franksClassic",
+                "-n",
+                "110"
+            ]
+        },
+        {
+            "name": "Franks 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "franksClassic",
+                "-n",
+                "1010"
+            ]
+        }
+    ]
+}
