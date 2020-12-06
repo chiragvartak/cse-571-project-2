@@ -682,7 +682,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
         print 'Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate)
         print 'Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins])
 
-    modelFile = "model.txt"
+    modelFile = "models/%s_model.txt" % commonModel.layout
     print "Writing model to file", modelFile
     commonModel.writeModelToFile(modelFile)
     print "done"

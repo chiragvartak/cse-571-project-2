@@ -14,6 +14,8 @@ class Model(object):
         self.start_time = None  # time you started running simulations. Use to calculate self.total_time
         self.total_time = None  # total time it took to complete
         self.total_simulations = 0
+
+        self.states_you_didnt_see_in_training = []
         
         # experimental:
         self.use_winThreshold = True
@@ -77,6 +79,12 @@ class Model(object):
             f.write("Final win threshold: %s\n" % self.winThreshold)
             f.write("Average score: %s\n" % self.get_average_score())
             f.write("Total number of nodes: %s\n\n" % len(self.data))
+            f.write("Number of states you saw in real games which you had not seen in training: %s\n" % len(self.states_you_didnt_see_in_training))
+            f.write("States you saw in real games which you had not seen in training:\n\n")
+            for state in self.states_you_didnt_see_in_training:
+                f.write("%s\n" % state)
+
+            f.write("\nData:\n\n")
             for key, value in self.data.items():
                 f.write(str(key) + ": " + str(value) + "\n")
 

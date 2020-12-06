@@ -175,6 +175,23 @@
             ]
         },
         {
+            "name": "Franks 100",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "100",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "franksClassic",
+                "-n",
+                "110"
+            ]
+        },
+        {
             "name": "Franks 1000",
             "type": "python",
             "request": "launch",

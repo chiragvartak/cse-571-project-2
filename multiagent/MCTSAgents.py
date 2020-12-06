@@ -52,8 +52,9 @@ class MCTSAgent(MultiAgentSearchAgent):
             if self.use_heuristic:
                 # print("using heuristic for tiebreak")
                 if sum([actionTuple[1] for actionTuple in prunedActionTuples]) == 0:
-                    print("never saw this state in training")
-                    print(fbgs)
+                    # print("never saw this state in training")
+                    # print(fbgs)
+                    model.states_you_didnt_see_in_training.append(fbgs)
                 actionToReturn = self.getActionFromHeuristic(fbgs.rawGameState, 
                                                             [actionTuple[0] for actionTuple in prunedActionTuples])
             else:
