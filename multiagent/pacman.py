@@ -634,6 +634,8 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
     rules = ClassicGameRules(timeout)
     games = []
 
+    import time
+    start_time = time.time()
     for i in range( numGames ):
         beQuiet = i < numTraining
         if beQuiet:
@@ -672,7 +674,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
     modelFile = "model.txt"
     print "Writing model to file", modelFile
     commonModel.writeModelToFile(modelFile)
-    print "done"
+    print("Done in %s seconds" % str(time.time()-start_time))
 
     return games
 

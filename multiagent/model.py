@@ -1,6 +1,7 @@
 from collections import namedtuple
 from featureBasedGameState import FeatureBasedGameState
 import pickle
+import os
 
 ModelEntry = namedtuple('ModelEntry', "nWins pseudoWins nSimulations avgReward")
 
@@ -20,19 +21,18 @@ class Model(object):
         self.saveModel()
 
     def saveModel(self):
+        print("pickling the model")
         with open("model.pkl", 'wb') as f:
             pickle.dump(self.data, f)
-
+        print("successfully pickled the model")
 
 
 def getModel(filename = "model.pkl"):
     model = Model()
-    try:
-        with open(filename, 'rb') as f:
+    if os.path.exists(filename):
+        with open(filename, 'rb') as f: 
             data = pickle.load(f)
         model.data = data
-    except:
-        pass
     return model
 
 

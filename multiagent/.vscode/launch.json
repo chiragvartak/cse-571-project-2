@@ -12,13 +12,13 @@
             "console": "integratedTerminal",
             "args": [
                 "--numTraining",
-                "10000",
+                "100",
                 "-p",
                 "MCTSAgent",
                 "-l",
                 "smallRobust",
                 "-n",
-                "10010"
+                "110"
             ]
         },
         {

@@ -390,16 +390,24 @@ class MCTSAgent(MultiAgentSearchAgent):
 
     def realActionToTake(self, fbgs, model):
         # print "Choosing real action"
-        valueActionPairs = []  # Value can be whatever you formulate it to be
+        actionTuples = []
         for action in fbgs.rawGameState.getLegalActions():
-            value = None
-            if (fbgs, action) not in model.data:
-                value = 0
-            else:
-                value = model.data[(fbgs, action)].nSimulations  # MCTS thing for now - select action with max simulations
-                # value = model.data[(fbgs, action)].avgReward
-            valueActionPairs.append((value, action))
-        return max(valueActionPairs)[1]
+            nSimulations = 0
+            nWins = 0
+            if (fbgs, action) in model.data:
+                nSimulations = model.data[(fbgs, action)].nSimulations
+                nWins = model.data[(fbgs, action)].nWins
+            actionTuples.append((action, nSimulations, nWins))
+
+        # pick the action that has been visited the most (max nSimulations)
+        max_nSimulations = max([actionTuple[1] for actionTuple in actionTuples])
+        prunedActionTuples = [actionTuple for actionTuple in actionTuples if actionTuple[1] == max_nSimulations]
+        # if there are multiple elements with the max value, pick the one with the max wins
+        max_nWins = max([actionTuple[2] for actionTuple in prunedActionTuples])
+        prunedActionTuples = [actionTuple for actionTuple in prunedActionTuples if actionTuple[2] == max_nWins]
+
+        # if there are still multiple elements with the max wins, pick randomly
+        return random.choice(prunedActionTuples)[0]
 
     def getUCTValues(self, fbgs, model):
         # type: (FeatureBasedGameState, Model) -> List[(float, str)]
