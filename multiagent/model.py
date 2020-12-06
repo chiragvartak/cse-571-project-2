@@ -17,7 +17,7 @@ class Model(object):
         with open(file, 'w') as f:
             for key, value in self.data.items():
                 f.write(str(key) + ": " + str(value) + "\n")
-        # self.saveModel()
+        self.saveModel()
 
     def saveModel(self):
         with open("model.pkl", 'wb') as f:

@@ -657,6 +657,9 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             cPickle.dump(components, f)
             f.close()
 
+        if (i+1)%10 == 0 and i < numTraining:
+            sys.stdout.write("\rSimulations completed: %s" % str(i+1))
+
     if (numGames-numTraining) > 0:
         scores = [game.state.getScore() for game in games]
         wins = [game.state.isWin() for game in games]
