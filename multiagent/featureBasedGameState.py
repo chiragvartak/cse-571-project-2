@@ -37,7 +37,12 @@ class FeatureBasedGameState(object):
         #self.foodEast = None
         #self.foodWest = None
 
-        self.closestFood = None
+        self.manhattanFood = None
+
+        #[!!!]TODO
+        #self.manhattanGhosts = None
+
+        self.wholeKitchenSink = None
         """-------------------------------------------------------------------------------------------------------------------------------"""
 
         # Caching some stuff for faster calculations - don't change this please!
@@ -65,7 +70,10 @@ class FeatureBasedGameState(object):
         #self.foodEast = self.rawGameState.hasFood(x + 1, y)
         #self.foodWest = self.rawGameState.hasFood(x - 1, y)
 
-        self.closestFood = self.closestFoodEvalFunction(self.rawGameState)
+        self.manhattanFood = self.closestFoodEvalFunction(self.rawGameState)
+
+        tempAction = self.getAction(self, rawGameState)
+        self.wholeKitchenSink = self.evaluationFunction(self, rawGameState, tempAction)
 
         """-------------------------------------------------------------------------------------------------------------------------------"""
 
@@ -105,7 +113,10 @@ class FeatureBasedGameState(object):
     """FM: My old eval function from project 2"""
     def closestFoodEvalFunction(self, rawGameState):
         # Borrowed and modified given boilerplate variables from Q1 evaluation function
-        currentGameState = self.rawGameState
+
+        """ [!!!] NEW ADDITION """
+        currentGameState = self.rawGameState    
+
         pacmanPosition = currentGameState.getPacmanPosition()
         foodPosition = currentGameState.getFood().asList()
         foodSum = 0
@@ -123,6 +134,126 @@ class FeatureBasedGameState(object):
             # (>>>) Converted to float to prevent unnecessary truncation, which caused failing test cases
             return currentGameState.getScore() + 400.0/foodSum
 
+    """FM: New Eval Function to track ghosts"""
+    #[!!!]TODO
+
+    """FM: Old boilerplate to assist with ghost eval function"""
+    def getAction(self, rawGameState):
+            """
+            You do not need to change this method, but you're welcome to.
+            getAction chooses among the BEST OPTIONS according to the evaluation function.
+            Just like in the previous project, getAction takes a GameState and returns
+            some Directions.X for some X in the set {North, South, West, East, Stop}
+            """
+            # Collect legal moves and successor states
+            """ [!!!] NEW ADDITION """
+            gameState = self.rawGameState   
+
+            legalMoves = gameState.getLegalActions()
+
+            # Choose one of the best actions
+            scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+            bestScore = max(scores)
+            bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+            chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+
+            "Add more of your code here if you want to"
+
+            return legalMoves[chosenIndex]
+
+    """FM: Old boilerplate to assist with ghost eval function"""
+    def evaluationFunction(self, currentGameState, action):
+        """
+        Design a better evaluation function here.
+        The evaluation function takes in the current and proposed successor
+        GameStates (pacman.py) and returns a number, where HIGHER numbers are better.
+        The code below extracts some useful information from the state, like the
+        REMAINING food (newFood) and Pacman position after moving (newPos).
+        newScaredTimes holds the number of moves that each ghost will remain
+        scared because of Pacman having eaten a power pellet.
+        Print out these variables to see what you're getting, then combine them
+        to create a masterful evaluation function.
+        """
+        # Useful information you can extract from a GameState (pacman.py)
+        successorGameState = currentGameState.generatePacmanSuccessor(action)
+        newPos = successorGameState.getPacmanPosition()
+        newFood = successorGameState.getFood()  # REMAINING food to acquire
+        newGhostStates = successorGameState.getGhostStates()
+        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+
+        "*** YOUR CODE HERE ***"
+        # (!!!) 
+        # REMEMBER: Reflex Agents perform based on the CURRENT percept only. Behavioral rules are static. 
+            # Agent seeks out maximum score. 
+                # (Move Away If Vulnerable): PENALIZE closing ghosts
+                # (Move Toward If Clear or Invulnerable): REWARD food consumption
+            # newFood can be converted to list
+            # evaluate state-action pairs for evaluation
+
+        # --- FOOD DISTANCE: Distance heuristic for ALL the food pellets ---
+        foodDistanceSum = 0
+        foodDistanceMIN = MAX
+        foodDistanceList = []
+
+        # Calculate total distances of all food
+        for remaniningFoodPellet in newFood.asList():
+            # Append to list of food distances, update global sum value
+            remainingFoodVal = manhattanDistance(remaniningFoodPellet, newPos)
+            foodDistanceList.append(remainingFoodVal)
+            foodDistanceSum += remainingFoodVal
+
+            # Calculate "rush attract" value to eliminate pacman oscillation
+            if remainingFoodVal <= foodDistanceMIN or foodDistanceMIN == MAX:
+                foodDistanceMIN = remainingFoodVal
+
+        # --- GHOST DISTANCE: Distance Heuristic for ALL the GHOST Positions respective to PACMAN ---
+        ghostDistanceSum = 0
+        ghostDistanceMIN = MAX
+        ghostDistanceList = []
+
+        # GHOST DISTANCE: Distance Heuristic for Ghost Positions
+        ghostDistance = 0
+        ghostProximityCount = 0
+
+        # Calculate total distances of all ghosts. Encourage FARTHER AWAY FROM ghosts -> less penalty
+        successorGhostPositions = successorGameState.getGhostPositions()
+        distanceToClosestGhost = manhattanDistance(newPos, newGhostStates[0].getPosition())
+
+        for ghost in successorGhostPositions:
+            # Append to list of ghost distances, update global sum value
+            ghostDistance = manhattanDistance(newPos, ghost)
+            ghostDistanceList.append(ghostDistance)
+            ghostDistanceSum += ghostDistance
+
+            # Calculate closest ghost to ensure Pacman survival
+            if ghostDistance <= ghostDistanceMIN or ghostDistanceMIN == MIN:
+                ghostDistanceMIN = ghostDistance
+
+            # Calculate number of ghosts that could compromise Pacman
+            if ghostDistance <= 1:
+                ghostProximityCount += 1
+
+        # --- Primary Evaluation Function Calculations ---
+        # Pre-calculated successorGameState to save runtime
+        finalScore = successorGameState.getScore()
+
+        # Took into account remaining foodPellets
+        if foodDistanceSum != 0:
+            finalScore += (12.0/min(foodDistanceList))
+
+        # Took into account distance of closest ghost and promximity of ghosts near Pacman
+        # More accurate to take into account distance of SINGLE CLOSEST ghost, as bugs could scale with net ghost distance (each w diff behavior)
+        
+        # Use of 'or' to consider edge case of eaten ghost that is revived and now hunting for pacman. Pacman must evade, not destroy rest of vulnerable ghosts
+        if distanceToClosestGhost > 0 or len(newScaredTimes) == 0:
+            finalScore -= (12.0/ float(ghostDistanceMIN)) + ghostProximityCount
+
+        # If Ghosts are scared, ignore and eat pellets like normal
+        elif distanceToClosestGhost > 0 and len(newScaredTimes) != 0:
+            finalScore += (12.0/min(foodDistanceList))
+
+        return finalScore
+
     """-------------------------------------------------------------------------------------------------------------------------------"""
     """ [!!!] Area to change """
 
@@ -136,7 +267,8 @@ class FeatureBasedGameState(object):
                 self.ghostSouthWest,
                 self.ghostSouthEast,
                 self.ghostNorthEast,
-                self.closestFood
+                self.manhattanFood,
+                self.wholeKitchenSink
                 #self.foodNorth,
                 #self.foodSouth,
                 #self.foodEast,
@@ -165,7 +297,8 @@ class FeatureBasedGameState(object):
             "ghostSouthWest": self.ghostSouthWest,
             "ghostSouthEast": self.ghostSouthEast,
             "ghostNorthEast": self.ghostNorthEast,
-            "closestFood": self.closestFood
+            "manhattanFood": self.manhattanFood,
+            "wholeKitchenSink": self.wholeKitchenSink
             #"foodNorth": self.foodNorth,
             #"foodSouth": self.foodSouth,
             #"foodEast": self.foodEast,
