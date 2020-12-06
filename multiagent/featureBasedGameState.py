@@ -4,6 +4,13 @@ from util import euclidean_distance, Counter
 from util import *
 # from typing import List
 
+"""FM: Imported from my own multiAgents.py"""
+from util import manhattanDistance
+from game import Directions
+import random, util
+
+from game import Agent
+
 class FeatureBasedGameState(object):
     def __init__(self, gameState):
         # type: (GameState) -> None
@@ -58,7 +65,7 @@ class FeatureBasedGameState(object):
         #self.foodEast = self.rawGameState.hasFood(x + 1, y)
         #self.foodWest = self.rawGameState.hasFood(x - 1, y)
 
-        self.closestFood = closestFoodEvalFunction(self.rawGameState)
+        self.closestFood = self.closestFoodEvalFunction(self.rawGameState)
 
         """-------------------------------------------------------------------------------------------------------------------------------"""
 
@@ -96,8 +103,9 @@ class FeatureBasedGameState(object):
             raise Exception("You have provided an invalid direction: ", direction)
 
     """FM: My old eval function from project 2"""
-    def closestFoodEvalFunction(currentGameState):
+    def closestFoodEvalFunction(self, rawGameState):
         # Borrowed and modified given boilerplate variables from Q1 evaluation function
+        currentGameState = self.rawGameState
         pacmanPosition = currentGameState.getPacmanPosition()
         foodPosition = currentGameState.getFood().asList()
         foodSum = 0
