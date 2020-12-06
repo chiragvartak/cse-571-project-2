@@ -60,32 +60,6 @@ class FeatureBasedGameState(object):
 
         self.closestFood = closestFoodEvalFunction(self.rawGameState)
 
-        """FM: My old eval function from project 2"""
-        def closestFoodEvalFunction(currentGameState):
-            """
-              Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
-              evaluation function (question 5).
-            """
-
-            "*** YOUR CODE HERE ***"
-            # Borrowed and modified given boilerplate variables from Q1 evaluation function
-            pacmanPosition = currentGameState.getPacmanPosition()
-            foodPosition = currentGameState.getFood().asList()
-            foodSum = 0
-
-            # Took the sum of manhattan distances from all remaining food
-            for food in foodPosition:
-                foodSum += manhattanDistance(pacmanPosition, food)
-
-            # Returns if Pacman has eaten ALL food capsules 
-            if foodSum == 0:
-                return currentGameState.getScore()
-
-            # If food still remains on the map, return updated current score
-            else:
-                # (>>>) Converted to float to prevent unnecessary truncation, which caused failing test cases
-                return currentGameState.getScore() + 400.0/foodSum
-
         """-------------------------------------------------------------------------------------------------------------------------------"""
 
     def findClosestGhosts(self):
@@ -120,6 +94,26 @@ class FeatureBasedGameState(object):
             return (x+distance, y) in closestGhosts
         else:
             raise Exception("You have provided an invalid direction: ", direction)
+
+    """FM: My old eval function from project 2"""
+    def closestFoodEvalFunction(currentGameState):
+        # Borrowed and modified given boilerplate variables from Q1 evaluation function
+        pacmanPosition = currentGameState.getPacmanPosition()
+        foodPosition = currentGameState.getFood().asList()
+        foodSum = 0
+
+        # Took the sum of manhattan distances from all remaining food
+        for food in foodPosition:
+            foodSum += manhattanDistance(pacmanPosition, food)
+
+        # Returns if Pacman has eaten ALL food capsules 
+        if foodSum == 0:
+            return currentGameState.getScore()
+
+        # If food still remains on the map, return updated current score
+        else:
+            # (>>>) Converted to float to prevent unnecessary truncation, which caused failing test cases
+            return currentGameState.getScore() + 400.0/foodSum
 
     """-------------------------------------------------------------------------------------------------------------------------------"""
     """ [!!!] Area to change """
