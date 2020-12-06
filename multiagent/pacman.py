@@ -48,6 +48,7 @@ from util import manhattanDistance
 import util, layout
 import sys, types, time, random, os
 from model import commonModel
+from model import WinTuple
 from featureBasedGameState import FeatureBasedGameState
 
 ###################################################
@@ -693,29 +694,16 @@ def updateModel(model, game):
                       in zip(game.moveHistory, game.stateHistory) if move[0] == 0]
     score = game.state.getScore()
 
-    # update running total for entire model
+    model.overall_winTuples.append(WinTuple(didWin=game.state.isWin(), score=score))
     model.total_simulations += 1
-    model.total_wins += game.state.isWin()
 
     updated = set()
     for fbgs, action in pairFbgsActions:
         # If it is already updated, don't update again
         if (fbgs, action) in updated:
             continue
-
-        existingNWins = 0
-        existingNSimulations = 0
-        existingAvgReward = 0.0
-        if (fbgs, action) in model.data:
-            existingNWins = model.data[(fbgs, action)].nWins
-            existingNSimulations = model.data[(fbgs, action)].nSimulations
-            existingAvgReward = model.data[(fbgs, action)].avgReward
-        newNWins = (existingNWins+1) if game.state.isWin() else existingNWins
-        newNSimulations = existingNSimulations + 1
-        n = existingNSimulations
-        newAvgReward = n/(n+1.0) * existingAvgReward + score/(n+1.0)
-
-        model.updateEntry(fbgs, action, newNWins, newNSimulations, newAvgReward)
+        
+        model.updateEntry(fbgs, action, game.state.isWin(), score)
         updated.add((fbgs, action))
 
 
