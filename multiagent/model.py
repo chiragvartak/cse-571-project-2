@@ -18,7 +18,7 @@ class Model(object):
         self.states_you_didnt_see_in_training = []
         
         # experimental:
-        self.use_winThreshold = True
+        self.use_winThreshold = False
         self.winThreshold = -9999999  # moving threshold. When game is over, if the final score > self.win_threshold, count it as a win
         self.top_scores = TopList(10)  # keep track of top scores seen. The number of elements in this list indirectly determines your winThreshold and how fast it changes
         self.overall_winTuples = []  # will be a list of one WinTuple per simulation ran
@@ -68,10 +68,13 @@ class Model(object):
         self.top_scores.update(score)
         self.winThreshold = self.top_scores.get_median()  # guarantees half of the top scores count as effective wins
 
-    def writeModelToFile(self, file="model.txt"):
+    def writeModelToFile(self, real_games_output, file="model.txt"):
         with open(file, 'w') as f:
             f.write("Playing on %s\n" % self.layout)
-            f.write("Took %s seconds\n" % self.total_time)
+            f.write("Took %s seconds to train\n\n" % self.total_time)
+            f.write("Real Games info:\n")
+            f.write("%s\n\n" % real_games_output)
+            f.write("Training info:\n")
             f.write("Total number of simulations run: %s\n" % self.total_simulations)
             f.write("Total number of literal wins: %s\n" % self.total_literalWins)
             f.write("Use win threshold: %s\n" % self.use_winThreshold)

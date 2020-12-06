@@ -663,7 +663,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             cPickle.dump(components, f)
             f.close()
         
-        if (i+1)%10 == 0:
+        if (i+1)%10 == 0 and i < numTraining:
             sys.stdout.write("\rSimulations completed: %s" % str(i+1))
         
         if i+1 == numTraining:
@@ -673,18 +673,22 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
                 commonModel.total_effectiveWins = commonModel.get_total_effectiveWins()
             print("\n")
 
+
+    real_games_output = ""
     if (numGames-numTraining) > 0:
         scores = [game.state.getScore() for game in games]
         wins = [game.state.isWin() for game in games]
         winRate = wins.count(True)/ float(len(wins))
-        print 'Average Score:', sum(scores) / float(len(scores))
-        print 'Scores:       ', ', '.join([str(score) for score in scores])
-        print 'Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate)
-        print 'Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins])
+        print_average = 'Average Score:', sum(scores) / float(len(scores))
+        print_score = 'Scores:       ', ', '.join([str(score) for score in scores])
+        print_winRate = 'Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate)
+        print_record = 'Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins])
+        real_games_output = ("%s\n%s\n%s\n%s" % (print_average, print_score, print_winRate, print_record))
+        print(real_games_output)
 
     modelFile = "models/%s_model.txt" % commonModel.layout
-    print "Writing model to file", modelFile
-    commonModel.writeModelToFile(modelFile)
+    print "\n\nWriting model to file", modelFile
+    commonModel.writeModelToFile(real_games_output, modelFile)
     print "done"
 
     return games
