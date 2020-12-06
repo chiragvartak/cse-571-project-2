@@ -12,8 +12,8 @@ class MCTSAgent(MultiAgentSearchAgent):
         self.numberOfTrainingGames = int(numTraining)
         self.evaluationFunction = util.lookup(evalFn, globals())
 
-        # For testing and analysis, we can toggle a flag that prevents pacman from ever using UCT
-        self.use_UCT = True
+        # For testing and analysis, we can toggle a flag that prevents pacman allows pacman to use evalFn in certain cases
+        self.use_heuristic = True
 
     def registerInitialState(self, state):
         self.currentGame += 1
@@ -31,6 +31,7 @@ class MCTSAgent(MultiAgentSearchAgent):
 
     def realActionToTake(self, fbgs, model):
         # print "Choosing real action"
+        actionToReturn = None
         actionTuples = []
         for action in fbgs.rawGameState.getLegalActions():
             nSimulations = 0
@@ -39,19 +40,26 @@ class MCTSAgent(MultiAgentSearchAgent):
                 nSimulations = model.data[(fbgs, action)].nSimulations
                 nWins = model.data[(fbgs, action)].nWins
             actionTuples.append((action, nSimulations, nWins))
-            
-        if sum([actionTuple[1] for actionTuple in actionTuples]) == 0:
-            print("No information... wing it?")
 
         # pick the action that has been visited the most (max nSimulations)
         max_nSimulations = max([actionTuple[1] for actionTuple in actionTuples])
-        actionTuples = [actionTuple for actionTuple in actionTuples if actionTuple[1] == max_nSimulations]
+        prunedActionTuples = [actionTuple for actionTuple in actionTuples if actionTuple[1] == max_nSimulations]
         # if there are multiple elements with the max value, pick the one with the max wins
-        max_nWins = max([actionTuple[2] for actionTuple in actionTuples])
-        actionTuples = [actionTuple for actionTuple in actionTuples if actionTuple[2] == max_nWins]
+        max_nWins = max([actionTuple[2] for actionTuple in prunedActionTuples])
+        prunedActionTuples = [actionTuple for actionTuple in prunedActionTuples if actionTuple[2] == max_nWins]
         
-        # if there are still multiple elements with the max wins, pick randomly
-        return random.choice(actionTuples)[0]
+        if len(prunedActionTuples) > 1:
+            if self.use_heuristic:
+                print("using heuristic")
+                actionToReturn = self.getActionFromHeuristic(fbgs.rawGameState, 
+                                                            [actionTuple[0] for actionTuple in prunedActionTuples])
+            else:
+                # if there are still multiple elements with the max wins, pick randomly
+                actionToReturn = random.choice(prunedActionTuples)[0]
+        else:
+            actionToReturn = prunedActionTuples[0][0]
+
+        return actionToReturn
 
     def trainingActionToTake(self, fbgs, model):
         # type: (FeatureBasedGameState, Model) -> List[(float, str)]
@@ -60,8 +68,8 @@ class MCTSAgent(MultiAgentSearchAgent):
         w = {}
         n = {}
         N = 0
-        # c = sqrt(2)
-        c = 0.1  # clamp down exploration?
+        c = sqrt(2)
+        # c = 0.1  # clamp down exploration?
         legalActions = fbgs.rawGameState.getLegalActions()
         for action in legalActions:
             if (fbgs, action) not in model.data:
@@ -72,11 +80,11 @@ class MCTSAgent(MultiAgentSearchAgent):
                 w[action] = model.data[(fbgs, action)].nWins
             N += n[action]
 
-        if sum(n.values()) == 0 or not self.use_UCT:
+        if sum(n.values()) == 0 and self.use_heuristic:
             # You have not won in any of the children. Use an evaluation function to pick the action by weighted value
             actionToReturn = self.getActionByWeight(fbgs.rawGameState)
         else:
-            # You have visited at least one of the children. Use UCT to pick the action
+        # You have visited at least one of the children. Use UCT to pick the action
             uctValues = []
             for action in legalActions:
                 uctValue = self.getUCTValue(w[action], n[action], N, c)
@@ -111,6 +119,16 @@ class MCTSAgent(MultiAgentSearchAgent):
 
         return util.chooseFromDistribution(probabilities_and_actions)
 
+    def getActionFromHeuristic(self, gameState, actions):
+        max_value = float("-inf")
+        best_action = None
+        for action in actions:
+            value = self.evaluationFunction(gameState.generateSuccessor(0, action))
+            if value > max_value:
+                max_value = value
+                best_action = action
+
+        return best_action
 
     def getUCTValue(self, w, n, N, c):
         return w/(n+1.0) + c*sqrt(log(N+1.0)/(n+1.0))

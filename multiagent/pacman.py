@@ -669,6 +669,8 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
         if i+1 == numTraining:
             import time
             commonModel.total_time = time.time() - commonModel.start_time
+            if commonModel.use_winThreshold:
+                commonModel.total_effectiveWins = commonModel.get_total_effectiveWins()
             print("\n")
 
     if (numGames-numTraining) > 0:
@@ -696,14 +698,8 @@ def updateModel(model, game):
     score = game.state.getScore()
 
     model.overall_winTuples.append(WinTuple(didWin=didWin, score=score))
+    model.total_literalWins += didWin
     model.total_simulations += 1
-    model.update_winThreshold(score)
-
-    # the following updates to literal and total wins are not necessary for the agent to be successful.
-    # they are, however, useful for debugging.
-    # Probably comment these out unless you really want to see them while you're running, since they are somewhat costly to run
-    model.total_literalWins = model.get_total_literalWins()
-    model.total_effectiveWins = model.get_total_effectiveWins()
 
     updated = set()
     for fbgs, action in pairFbgsActions:
@@ -714,7 +710,14 @@ def updateModel(model, game):
         model.updateEntry(fbgs, action, didWin, score)
         updated.add((fbgs, action))
 
-    model.update_nWins_for_all_entries()
+    if model.use_winThreshold:
+        # the following update to total effective wins are not necessary for the agent to be successful.
+        # it is, however, useful for debugging.
+        # Probably comment it out unless you really want to see them while you're running, since it is somewhat costly to run
+        # model.total_effectiveWins = model.get_total_effectiveWins()
+
+        model.update_winThreshold(score)
+        model.update_nWins_for_all_entries()
 
 
 if __name__ == '__main__':

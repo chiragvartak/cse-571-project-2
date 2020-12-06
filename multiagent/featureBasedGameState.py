@@ -9,18 +9,9 @@ class FeatureBasedGameState(object):
         self.rawGameState = gameState
 
         # Please list all the features here. It becomes convenient; don't miss out any, or directly initialise elsewhere
-        self.ghostWithin2UnitNorth = None
-        self.ghostWithin2UnitWest = None
-        self.ghostWithin2UnitSouth = None
-        self.ghostWithin2UnitEast = None
-        self.ghostWithin1UnitNorth = None
-        self.ghostWithin1UnitWest = None
-        self.ghostWithin1UnitSouth = None
-        self.ghostWithin1UnitEast = None
-        self.ghostNorthWest = None
-        self.ghostSouthWest = None
-        self.ghostSouthEast = None
-        self.ghostNorthEast = None
+        self.directionToNearestGhost = None  # an integer; manhattan distance
+        self.distanceToNearestGhost = None  # an integer representing the angle from pacman to the nearest ghost
+        self.nearestGhostEdible = None  # is the nearest ghost scared? Is he scared for long enough for you to eat him if you get to him?
         self.directionToNearestFood = None  # an integer representing the angle from pacman to the nearest food pellet
         self.distanceToNearestFood = None  # an integer; manhattan distance
         self.numberOfFoods = None  # an integer; number of foods remaining
@@ -32,23 +23,21 @@ class FeatureBasedGameState(object):
         # Caching some stuff for faster calculations - don't change this please!
         self.closestGhosts = None
 
-        # Some things you might need
-        x, y = self.rawGameState.getPacmanPosition()
-
         # This is where you will calculate the features you have listed above
         pacmanPosition = self.rawGameState.getPacmanPosition()
-        self.ghostWithin2UnitNorth = self.doesGhostExist(pacmanPosition, 'North', 2)
-        self.ghostWithin2UnitWest = self.doesGhostExist(pacmanPosition, 'West', 2)
-        self.ghostWithin2UnitSouth = self.doesGhostExist(pacmanPosition, 'South', 2)
-        self.ghostWithin2UnitEast = self.doesGhostExist(pacmanPosition, 'East', 2)
-        self.ghostWithin1UnitNorth = self.doesGhostExist(pacmanPosition, 'North', 1)
-        self.ghostWithin1UnitWest = self.doesGhostExist(pacmanPosition, 'West', 1)
-        self.ghostWithin1UnitSouth = self.doesGhostExist(pacmanPosition, 'South', 1)
-        self.ghostWithin1UnitEast = self.doesGhostExist(pacmanPosition, 'East', 1)
-        self.ghostNorthWest = (x - 1, y + 1) in self.rawGameState.getGhostPositions()
-        self.ghostSouthWest = (x - 1, y - 1) in self.rawGameState.getGhostPositions()
-        self.ghostSouthEast = (x + 1, y - 1) in self.rawGameState.getGhostPositions()
-        self.ghostNorthEast = (x + 1, y + 1) in self.rawGameState.getGhostPositions()   
+        
+        self.distanceToNearestGhost = 99999999
+        for ghost in self.findClosestGhosts():
+            distance_to_ghost = util.manhattanDistance(pacmanPosition, ghost)
+            if distance_to_ghost < self.distanceToNearestGhost:
+                self.distanceToNearestGhost = distance_to_ghost
+                # self.directionToNearestGhost = util.getAngle(pacmanPosition, ghost, round_to_nearest=45)
+                self.directionToNearestGhost = util.getDominantDirection(pacmanPosition, ghost)
+
+        if self.distanceToNearestGhost > 5:  # don't worry about the distance to ghost if it's more than 5 away
+            self.distanceToNearestGhost = None
+
+        self.nearestGhostEdible = None  # TODO: implement later
         
         self.distanceToNearestFood = 99999999
         foods = self.rawGameState.getFood().asList()
@@ -56,7 +45,8 @@ class FeatureBasedGameState(object):
             distance_to_food = util.manhattanDistance(pacmanPosition, food)
             if distance_to_food < self.distanceToNearestFood:
                 self.distanceToNearestFood = distance_to_food
-                self.directionToNearestFood = util.getAngle(pacmanPosition, food, round_to_nearest=45)
+                # self.directionToNearestFood = util.getAngle(pacmanPosition, food, round_to_nearest=45)
+                self.directionToNearestFood = util.getDominantDirection(pacmanPosition, food)
         
         if len(foods) < 5:  # don't worry about the number of foods left until it's very significant
             self.numberOfFoods = len(foods)
@@ -102,18 +92,9 @@ class FeatureBasedGameState(object):
             raise Exception("You have provided an invalid direction: ", direction)
 
     def __key(self):
-        return (self.ghostWithin2UnitNorth,
-                self.ghostWithin2UnitWest,
-                self.ghostWithin2UnitSouth,
-                self.ghostWithin2UnitEast,
-                self.ghostWithin1UnitNorth,
-                self.ghostWithin1UnitWest,
-                self.ghostWithin1UnitSouth,
-                self.ghostWithin1UnitEast,
-                self.ghostNorthWest,
-                self.ghostSouthWest,
-                self.ghostSouthEast,
-                self.ghostNorthEast,
+        return (self.directionToNearestGhost,
+                self.distanceToNearestGhost,
+                self.nearestGhostEdible,
                 self.directionToNearestFood,
                 self.distanceToNearestFood,
                 self.numberOfFoods,
@@ -133,18 +114,9 @@ class FeatureBasedGameState(object):
 
     def __repr__(self):
         return str({
-            "ghostWithin2UnitNorth": self.ghostWithin2UnitNorth,
-            "ghostWithin2UnitWest": self.ghostWithin2UnitWest,
-            "ghostWithin2UnitSouth": self.ghostWithin2UnitSouth,
-            "ghostWithin2UnitEast": self.ghostWithin2UnitEast,
-            "ghostWithin1UnitNorth": self.ghostWithin1UnitNorth,
-            "ghostWithin1UnitWest": self.ghostWithin1UnitWest,
-            "ghostWithin1UnitSouth": self.ghostWithin1UnitSouth,
-            "ghostWithin1UnitEast": self.ghostWithin1UnitEast,
-            "ghostNorthWest": self.ghostNorthWest,
-            "ghostSouthWest": self.ghostSouthWest,
-            "ghostSouthEast": self.ghostSouthEast,
-            "ghostNorthEast": self.ghostNorthEast,
+            "directionToNearestGhost": self.directionToNearestGhost,
+            "distanceToNearestGhost": self.distanceToNearestGhost,
+            "nearestGhostEdible": self.nearestGhostEdible,
             "directionToNearestFood": self.directionToNearestFood,
             "distanceToNearestFood": self.distanceToNearestFood,
             "numberOfFoods": self.numberOfFoods,

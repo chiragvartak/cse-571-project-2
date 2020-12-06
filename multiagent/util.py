@@ -207,6 +207,62 @@ def manhattanDistance( xy1, xy2 ):
     "Returns the Manhattan distance between points xy1 and xy2"
     return abs( xy1[0] - xy2[0] ) + abs( xy1[1] - xy2[1] )
 
+
+# Franks: Add function for determining dominant direction from point A to point B
+def getDominantDirection(A, B):
+    # type: tuple, tuple -> int
+    """
+    May be faster than getAngle()
+    """
+    # A and B are both (x,y) pairs
+    # x axis goes west to east,
+    # y axis goes south the north
+    # return an integer corresponding to the degrees the direction corresponds to
+    
+    direction = None
+    delta = (B[0]-A[0], B[1]-A[1])
+    if delta[0] > 0:  # B is east of A
+        if delta[1] > 0:  # B is north of A
+            if abs(delta[0]) > abs(delta[1]):
+                direction = 0  # E
+            elif abs(delta[0]) < abs(delta[1]):
+                direction = 90 # N
+            else:
+                direction = 45  # NE
+        elif delta[1] < 0:  # B is south of A
+            if abs(delta[0]) > abs(delta[1]):
+                direction = 0  # E
+            elif abs(delta[0]) < abs(delta[1]):
+                direction = -90  # S
+            else:
+                direction = -45  # SE
+        else:
+            direction = 0  # E
+    elif delta[0] < 0:  # B is west of A
+        if delta[1] > 0:  # B is north of A
+            if abs(delta[0]) > abs(delta[1]):
+                direction = 180  # W
+            elif abs(delta[0]) < abs(delta[1]):
+                direction = 90  # N
+            else:
+                direction = 135  # NW
+        elif delta[1] < 0:  # B is south of A
+            if abs(delta[0]) > abs(delta[1]):
+                direction = 180  # W
+            elif abs(delta[0]) < abs(delta[1]):
+                direction = -90  # S
+            else:
+                direction = -135  # SW
+        else:
+            direction = 180  # W
+    else:
+        if delta[1] > 0:  # B is north of A
+            direction = 90  # N
+        elif delta[1] < 0:  # B is south of A
+            direction = -90  # S
+
+    return direction
+
 # Franks: Add function for determining angle from point A to point B
 import math
 def getAngle(A,B, round_to_nearest=45):

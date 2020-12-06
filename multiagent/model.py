@@ -16,6 +16,7 @@ class Model(object):
         self.total_simulations = 0
         
         # experimental:
+        self.use_winThreshold = True
         self.winThreshold = -9999999  # moving threshold. When game is over, if the final score > self.win_threshold, count it as a win
         self.top_scores = TopList(10)  # keep track of top scores seen. The number of elements in this list indirectly determines your winThreshold and how fast it changes
         self.overall_winTuples = []  # will be a list of one WinTuple per simulation ran
@@ -34,12 +35,13 @@ class Model(object):
             nSimulations = entry.nSimulations
             listOfWinTuples = entry.listOfWinTuples
 
-        # DO NOT UPDATE nWins HERE!!!!!! CALL model.update_nWins_for_all_entries() FROM SOMEWHERE ELSE
+        if not self.use_winThreshold:
+            nWins += didWin
         nSimulations += 1  # increment nSimulations, always
         listOfWinTuples.append(WinTuple(didWin=didWin, score=score))  # append your new WinTuple, always
 
-        for winTuple in listOfWinTuples:
-            nWins += winTuple.didWin or winTuple.score > self.winThreshold  # count a win either as a literal win, or as a score over the threshold
+        # for winTuple in listOfWinTuples:
+            # nWins += winTuple.didWin or winTuple.score > self.winThreshold  # count a win either as a literal win, or as a score over the threshold
 
         self.data[(fbgs, actionTaken)] = ModelEntry(nWins=nWins,
                                                     nSimulations=nSimulations,
@@ -63,11 +65,6 @@ class Model(object):
         # threshold is the average of the top scores seen so far
         self.top_scores.update(score)
         self.winThreshold = self.top_scores.get_median()  # guarantees half of the top scores count as effective wins
-        # top_score_mean = self.top_scores.get_mean()
-        # if top_score_mean < 0:
-        #     self.winThreshold = 1.25*top_score_mean
-        # else:
-        #     self.winThreshold = 0.95*top_score_mean
 
     def writeModelToFile(self, file="model.txt"):
         with open(file, 'w') as f:
@@ -75,6 +72,7 @@ class Model(object):
             f.write("Took %s seconds\n" % self.total_time)
             f.write("Total number of simulations run: %s\n" % self.total_simulations)
             f.write("Total number of literal wins: %s\n" % self.total_literalWins)
+            f.write("Use win threshold: %s\n" % self.use_winThreshold)
             f.write("Total number of effective wins: %s\n" % self.total_effectiveWins)
             f.write("Final win threshold: %s\n" % self.winThreshold)
             f.write("Average score: %s\n" % self.get_average_score())
