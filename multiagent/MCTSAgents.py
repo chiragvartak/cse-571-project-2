@@ -50,7 +50,10 @@ class MCTSAgent(MultiAgentSearchAgent):
         
         if len(prunedActionTuples) > 1:
             if self.use_heuristic:
-                print("using heuristic")
+                # print("using heuristic for tiebreak")
+                if sum([actionTuple[1] for actionTuple in prunedActionTuples]) == 0:
+                    print("never saw this state in training")
+                    print(fbgs)
                 actionToReturn = self.getActionFromHeuristic(fbgs.rawGameState, 
                                                             [actionTuple[0] for actionTuple in prunedActionTuples])
             else:

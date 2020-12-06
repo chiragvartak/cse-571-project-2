@@ -47,6 +47,9 @@ class FeatureBasedGameState(object):
                 self.distanceToNearestFood = distance_to_food
                 # self.directionToNearestFood = util.getAngle(pacmanPosition, food, round_to_nearest=45)
                 self.directionToNearestFood = util.getDominantDirection(pacmanPosition, food)
+
+        if self.distanceToNearestFood > 1:
+            self.distanceToNearestFood = -1  # use this value to denote a food outside the range of immediate relevance
         
         if len(foods) < 5:  # don't worry about the number of foods left until it's very significant
             self.numberOfFoods = len(foods)
