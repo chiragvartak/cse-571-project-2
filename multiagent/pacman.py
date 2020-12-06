@@ -663,6 +663,9 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
         
         if (i+1)%10 == 0:
             sys.stdout.write("\rSimulations completed: %s" % str(i+1))
+        
+        if i == numTraining:
+            print("\n")
 
     if (numGames-numTraining) > 0:
         scores = [game.state.getScore() for game in games]

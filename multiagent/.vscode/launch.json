@@ -39,20 +39,37 @@
             ]
         },
         {
-            "name": "Test 500",
+            "name": "Test 2000",
             "type": "python",
             "request": "launch",
             "program": "pacman.py",
             "console": "integratedTerminal",
             "args": [
                 "--numTraining",
-                "500",
+                "2000",
                 "-p",
                 "MCTSAgent",
                 "-l",
                 "testClassic",
                 "-n",
-                "510"
+                "2010"
+            ]
+        },
+        {
+            "name": "MinimaxClassic 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "minimaxClassic",
+                "-n",
+                "1010"
             ]
         },
         {

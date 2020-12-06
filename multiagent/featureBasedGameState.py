@@ -1,7 +1,5 @@
-# from model import Model
-# from pacman import GameState
+import util
 from util import euclidean_distance
-# from typing import List
 
 class FeatureBasedGameState(object):
     def __init__(self, gameState):
@@ -15,6 +13,10 @@ class FeatureBasedGameState(object):
         self.ghostWithin2UnitWest = None
         self.ghostWithin2UnitSouth = None
         self.ghostWithin2UnitEast = None
+        self.ghostWithin1UnitNorth = None
+        self.ghostWithin1UnitWest = None
+        self.ghostWithin1UnitSouth = None
+        self.ghostWithin1UnitEast = None
         self.ghostNorthWest = None
         self.ghostSouthWest = None
         self.ghostSouthEast = None
@@ -23,31 +25,49 @@ class FeatureBasedGameState(object):
         self.foodSouth = None
         self.foodEast = None
         self.foodWest = None
+        self.directionToNearestFood = None  # an integer representing the angle from pacman to the nearest food pellet
+        self.distanceToNearestFood = None  # an integer; manhattan distance
+        self.numberOfFoods = None  # an integer; number of foods remaining
         self.canMoveNorth = None
         self.canMoveWest = None
         self.canMoveSouth = None
         self.canMoveEast = None
 
         # Caching some stuff for faster calculations - don't change this please!
-        self.closestGhosts = None
+        # self.closestGhosts = None
 
         # Some things you might need
         x, y = self.rawGameState.getPacmanPosition()
 
         # This is where you will calculate the features you have listed above
         pacmanPosition = self.rawGameState.getPacmanPosition()
-        self.ghostWithin2UnitNorth = self.doesGhostExist(pacmanPosition, 'North', 1) or self.doesGhostExist(pacmanPosition, 'North', 2)
-        self.ghostWithin2UnitWest = self.doesGhostExist(pacmanPosition, 'West', 1) or self.doesGhostExist(pacmanPosition, 'West', 2)
-        self.ghostWithin2UnitSouth = self.doesGhostExist(pacmanPosition, 'South', 1) or self.doesGhostExist(pacmanPosition, 'South', 2)
-        self.ghostWithin2UnitEast = self.doesGhostExist(pacmanPosition, 'East', 1) or self.doesGhostExist(pacmanPosition, 'East', 2)
+        self.ghostWithin2UnitNorth = self.doesGhostExist(pacmanPosition, 'North', 2)
+        self.ghostWithin2UnitWest = self.doesGhostExist(pacmanPosition, 'West', 2)
+        self.ghostWithin2UnitSouth = self.doesGhostExist(pacmanPosition, 'South', 2)
+        self.ghostWithin2UnitEast = self.doesGhostExist(pacmanPosition, 'East', 2)
+        self.ghostWithin1UnitNorth = self.doesGhostExist(pacmanPosition, 'North', 1)
+        self.ghostWithin1UnitWest = self.doesGhostExist(pacmanPosition, 'West', 1)
+        self.ghostWithin1UnitSouth = self.doesGhostExist(pacmanPosition, 'South', 1)
+        self.ghostWithin1UnitEast = self.doesGhostExist(pacmanPosition, 'East', 1)
         self.ghostNorthWest = (x - 1, y + 1) in self.rawGameState.getGhostPositions()
         self.ghostSouthWest = (x - 1, y - 1) in self.rawGameState.getGhostPositions()
         self.ghostSouthEast = (x + 1, y - 1) in self.rawGameState.getGhostPositions()
         self.ghostNorthEast = (x + 1, y + 1) in self.rawGameState.getGhostPositions()
-        self.foodNorth = self.rawGameState.hasFood(x, y + 1)
-        self.foodSouth = self.rawGameState.hasFood(x, y - 1)
-        self.foodEast = self.rawGameState.hasFood(x + 1, y)
-        self.foodWest = self.rawGameState.hasFood(x - 1, y)
+        # self.foodNorth = self.rawGameState.hasFood(x, y + 1)
+        # self.foodSouth = self.rawGameState.hasFood(x, y - 1)
+        # self.foodEast = self.rawGameState.hasFood(x + 1, y)
+        # self.foodWest = self.rawGameState.hasFood(x - 1, y)    
+        
+        self.distanceToNearestFood = 99999999
+        foods = self.rawGameState.getFood().asList()
+        for food in foods:
+            distance_to_food = util.manhattanDistance(pacmanPosition, food)
+            if distance_to_food < self.distanceToNearestFood:
+                self.distanceToNearestFood = distance_to_food
+                self.directionToNearestFood = util.getAngle(pacmanPosition, food)
+        
+        if len(foods) < 5:  # don't worry about the number of foods left until it's very significant
+            self.numberOfFoods = len(foods)
 
         # information about legal actions
         self.canMoveNorth = 'North' in self.rawGameState.getLegalPacmanActions()
@@ -58,8 +78,8 @@ class FeatureBasedGameState(object):
 
     def findClosestGhosts(self):
         "There can be multiple closest ghosts. So this returns a list of tuples. Eg. [(1,1), (5,4)]"
-        if self.closestGhosts is not None:
-            return self.closestGhosts
+        # if self.closestGhosts is not None:
+        #     return self.closestGhosts
         pacmanPosition = self.rawGameState.getPacmanPosition()
         ghostPositions = self.rawGameState.getGhostPositions()
         minDistance = 999999999
@@ -71,8 +91,9 @@ class FeatureBasedGameState(object):
                 minDistance = ghostDistance
             elif ghostDistance == minDistance:  # TODO: this might be problematic - floating point equality comparison
                 closestGhosts.append(ghostPosition)
-        self.closestGhosts = closestGhosts
-        return self.closestGhosts
+        # self.closestGhosts = closestGhosts
+        # return self.closestGhosts
+        return closestGhosts
 
     def doesGhostExist(self, currentPos, direction, distance):
         "Find if a ghost exists in a certain direction from the given position: doesGhostExist((2,3), 'North', 1)"
@@ -94,6 +115,10 @@ class FeatureBasedGameState(object):
                 self.ghostWithin2UnitWest,
                 self.ghostWithin2UnitSouth,
                 self.ghostWithin2UnitEast,
+                self.ghostWithin1UnitNorth,
+                self.ghostWithin1UnitWest,
+                self.ghostWithin1UnitSouth,
+                self.ghostWithin1UnitEast,
                 self.ghostNorthWest,
                 self.ghostSouthWest,
                 self.ghostSouthEast,
@@ -122,6 +147,10 @@ class FeatureBasedGameState(object):
             "ghostWithin2UnitWest": self.ghostWithin2UnitWest,
             "ghostWithin2UnitSouth": self.ghostWithin2UnitSouth,
             "ghostWithin2UnitEast": self.ghostWithin2UnitEast,
+            "ghostWithin1UnitNorth": self.ghostWithin1UnitNorth,
+            "ghostWithin1UnitWest": self.ghostWithin1UnitWest,
+            "ghostWithin1UnitSouth": self.ghostWithin1UnitSouth,
+            "ghostWithin1UnitEast": self.ghostWithin1UnitEast,
             "ghostNorthWest": self.ghostNorthWest,
             "ghostSouthWest": self.ghostSouthWest,
             "ghostSouthEast": self.ghostSouthEast,

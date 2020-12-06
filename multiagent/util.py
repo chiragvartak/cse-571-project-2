@@ -206,6 +206,11 @@ class PriorityQueueWithFunction(PriorityQueue):
 def manhattanDistance( xy1, xy2 ):
     "Returns the Manhattan distance between points xy1 and xy2"
     return abs( xy1[0] - xy2[0] ) + abs( xy1[1] - xy2[1] )
+    
+# Franks: Add function for determining angle from point A to point B
+import math
+def getAngle(A,B, round_to_nearest=45):
+    return int(round_to_nearest * round(float(math.degrees(math.atan2(B[1]-A[1], B[0]-A[0])))/round_to_nearest))
 
 """
   Data structures and functions useful for various course projects
