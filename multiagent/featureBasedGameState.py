@@ -10,7 +10,10 @@ class FeatureBasedGameState(object):
         # Storing the GameState; it might be needed
         self.rawGameState = gameState
 
+        """-------------------------------------------------------------------------------------------------------------------------------"""
+        """ [!!!] Area to change """
         # Please list all the features here. It becomes convenient; don't miss out any, or directly initialise elsewhere
+        """FM: Good features to have; reflexive evasion of ghosts"""
         self.ghostWithin2UnitNorth = None
         self.ghostWithin2UnitWest = None
         self.ghostWithin2UnitSouth = None
@@ -19,10 +22,13 @@ class FeatureBasedGameState(object):
         self.ghostSouthWest = None
         self.ghostSouthEast = None
         self.ghostNorthEast = None
+
+        """FM: Bad set of features, need """
         self.foodNorth = None
         self.foodSouth = None
         self.foodEast = None
         self.foodWest = None
+        """-------------------------------------------------------------------------------------------------------------------------------"""
 
         # Caching some stuff for faster calculations - don't change this please!
         self.closestGhosts = None
@@ -30,6 +36,8 @@ class FeatureBasedGameState(object):
         # Some things you might need
         x, y = self.rawGameState.getPacmanPosition()
 
+        """-------------------------------------------------------------------------------------------------------------------------------"""
+        """ [!!!] Area to change """
         # This is where you will calculate the features you have listed above
         pacmanPosition = self.rawGameState.getPacmanPosition()
         self.ghostWithin2UnitNorth = self.doesGhostExist(pacmanPosition, 'North', 1) or self.doesGhostExist(pacmanPosition, 'North', 2)
@@ -40,11 +48,13 @@ class FeatureBasedGameState(object):
         self.ghostSouthWest = (x - 1, y - 1) in self.rawGameState.getGhostPositions()
         self.ghostSouthEast = (x + 1, y - 1) in self.rawGameState.getGhostPositions()
         self.ghostNorthEast = (x + 1, y + 1) in self.rawGameState.getGhostPositions()
+
+        """FM: Install manhattan distance/heuristic calculation of closest food pellet here"""
         self.foodNorth = self.rawGameState.hasFood(x, y + 1)
         self.foodSouth = self.rawGameState.hasFood(x, y - 1)
         self.foodEast = self.rawGameState.hasFood(x + 1, y)
         self.foodWest = self.rawGameState.hasFood(x - 1, y)
-
+        """-------------------------------------------------------------------------------------------------------------------------------"""
 
     def findClosestGhosts(self):
         "There can be multiple closest ghosts. So this returns a list of tuples. Eg. [(1,1), (5,4)]"
@@ -79,6 +89,10 @@ class FeatureBasedGameState(object):
         else:
             raise Exception("You have provided an invalid direction: ", direction)
 
+    """-------------------------------------------------------------------------------------------------------------------------------"""
+    """ [!!!] Area to change """
+
+    #Include all features here so you can hash properly
     def __key(self):
         return (self.ghostWithin2UnitNorth,
                 self.ghostWithin2UnitWest,
@@ -93,6 +107,7 @@ class FeatureBasedGameState(object):
                 self.foodEast,
                 self.foodWest
                 )
+    """-------------------------------------------------------------------------------------------------------------------------------"""
 
     def __hash__(self):
         return hash(self.__key())
@@ -102,6 +117,9 @@ class FeatureBasedGameState(object):
             return self.__key() == other.__key()
         return NotImplemented
 
+    """-------------------------------------------------------------------------------------------------------------------------------"""
+    """ [!!!] Area to change """
+    #Incorporate all features for metadata + debugging's sake
     def __repr__(self):
         return str({
             "ghostWithin2UnitNorth": self.ghostWithin2UnitNorth,
@@ -117,7 +135,7 @@ class FeatureBasedGameState(object):
             "foodEast": self.foodEast,
             "foodWest": self.foodWest
         })
-
+    """-------------------------------------------------------------------------------------------------------------------------------"""
 
 # Some utility functions that I require, I am putting here
 def _getSuccessorsAtDepth(gameState, agentIndex, depth):

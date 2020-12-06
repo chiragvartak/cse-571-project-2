@@ -11,7 +11,6 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -362,6 +361,7 @@ def betterEvaluationFunction(currentGameState):
 # Abbreviation
 better = betterEvaluationFunction
 
+"""--------------------------------------------------------------------------------------------------------------------------"""
 class MCTSAgent(MultiAgentSearchAgent):
     def __init__(self, evalFn = 'betterEvaluationFunction', numTraining = '0', isReal = False):
         self.currentGame = 0
@@ -421,3 +421,4 @@ class MCTSAgent(MultiAgentSearchAgent):
 
     def getUCTValue(self, w, n, N, c):
         return w/(n+1.0) + c*sqrt(log(N+1.0)/(n+1.0))
+"""--------------------------------------------------------------------------------------------------------------------------"""
