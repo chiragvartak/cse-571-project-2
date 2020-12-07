@@ -19,10 +19,6 @@ class FeatureBasedGameState(object):
         self.moveToClosestCapsule = None
         self.ghostWithin1UnitOfClosestCapsuleDirectionPoint = None
         self.ghostOnClosestCapsuleDirectionPoint = None
-        self.moveToClosestEdibleGhost = None
-        self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint = None
-        self.ghostOnClosestEdibleGhostDirectionPoint = None
-        self.pacmanWithin1UnitOfGhostRespawn = None
         self.canMoveNorth = None
         self.canMoveWest = None
         self.canMoveSouth = None
@@ -47,10 +43,6 @@ class FeatureBasedGameState(object):
         self.moveToClosestCapsule = self.getMoveToClosestCapsule()
         self.ghostWithin1UnitOfClosestCapsuleDirectionPoint = self.isGhostWithin1UnitOfDirectionPoint(self.moveToClosestCapsule)
         self.ghostOnClosestCapsuleDirectionPoint = self.isGhostOnDirectionPoint(self.moveToClosestCapsule)
-        self.moveToClosestEdibleGhost = self.getMoveToClosestEdibleGhost()
-        self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint = self.isGhostWithin1UnitOfDirectionPoint(self.moveToClosestEdibleGhost)
-        self.ghostOnClosestEdibleGhostDirectionPoint = self.isGhostOnDirectionPoint(self.moveToClosestEdibleGhost)
-        self.pacmanWithin1UnitOfGhostRespawn = self.isPacmanWithin1UnitOfGhostRespawn()
         self.canMoveNorth = 'North' in self.rawGameState.getLegalPacmanActions()
         self.canMoveWest = 'West' in self.rawGameState.getLegalPacmanActions()
         self.canMoveSouth = 'South' in self.rawGameState.getLegalPacmanActions()
@@ -212,10 +204,6 @@ class FeatureBasedGameState(object):
             self.moveToClosestCapsule,
             self.ghostWithin1UnitOfClosestCapsuleDirectionPoint,
             self.ghostOnClosestCapsuleDirectionPoint,
-            self.moveToClosestEdibleGhost,
-            self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint,
-            self.ghostOnClosestEdibleGhostDirectionPoint,
-            self.pacmanWithin1UnitOfGhostRespawn,
             self.canMoveNorth,
             self.canMoveWest,
             self.canMoveSouth,
@@ -238,10 +226,6 @@ class FeatureBasedGameState(object):
             "moveToClosestCapsule": self.moveToClosestCapsule,
             "ghostWithin1UnitOfClosestCapsuleDirectionPoint": self.ghostWithin1UnitOfClosestCapsuleDirectionPoint,
             "ghostOnClosestCapsuleDirectionPoint": self.ghostOnClosestCapsuleDirectionPoint,
-            "moveToClosestEdibleGhost": self.moveToClosestEdibleGhost,
-            "ghostWithin1UnitOfClosestEdibleGhostDirectionPoint": self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint,
-            "ghostOnClosestEdibleGhostDirectionPoint": self.ghostOnClosestEdibleGhostDirectionPoint,
-            "pacmanWithin1UnitOfGhostRespawn": self.pacmanWithin1UnitOfGhostRespawn,
             "canMoveNorth": self.canMoveNorth,
             "canMoveWest": self.canMoveWest,
             "canMoveSouth": self.canMoveSouth,
@@ -269,24 +253,9 @@ class FeatureBasedGameState(object):
         problem = searchAgents.PositionSearchProblem(self.rawGameState, goal=closestCapsulePosition, warn=False, visualize=False)
         sequenceOfActions = search.aStarSearch(problem)
         self.sequenceOfMovesToClosestCapsule = sequenceOfActions
-        return sequenceOfActions[0]
-
-    def getMoveToClosestEdibleGhost(self):
-        minDistance = 9999999
-        moveToClosestEdibleGhost = None
-        scaredGhostStates = self.findScaredGhostStates()
-        if not scaredGhostStates:
+        if not sequenceOfActions:
             return None
-        for scaredGhostState in scaredGhostStates:
-            problem = searchAgents.PositionSearchProblem(self.rawGameState, goal=scaredGhostState.getPosition(), warn=False, visualize=False)
-            sequenceOfActions = search.aStarSearch(problem)
-            if sequenceOfActions and len(sequenceOfActions) < minDistance and len(sequenceOfActions) < scaredGhostState.scaredTimer:
-                # You will be able to get to this ghost before his timer runs out
-                minDistance = len(sequenceOfActions)
-                moveToClosestEdibleGhost = sequenceOfActions[0]
-
-        self.moveToClosestEdibleGhost = moveToClosestEdibleGhost
-        return moveToClosestEdibleGhost 
+        return sequenceOfActions[0]
 
     def __getstate__(self):
         return (
@@ -296,10 +265,6 @@ class FeatureBasedGameState(object):
             self.moveToClosestCapsule,
             self.ghostWithin1UnitOfClosestCapsuleDirectionPoint,
             self.ghostOnClosestCapsuleDirectionPoint,
-            self.moveToClosestEdibleGhost,
-            self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint,
-            self.ghostOnClosestEdibleGhostDirectionPoint,
-            self.pacmanWithin1UnitOfGhostRespawn,
             self.canMoveNorth,
             self.canMoveWest,
             self.canMoveSouth,
@@ -313,14 +278,10 @@ class FeatureBasedGameState(object):
         self.moveToClosestCapsule = state[3]
         self.ghostWithin1UnitOfClosestCapsuleDirectionPoint = state[4]
         self.ghostOnClosestCapsuleDirectionPoint = state[5]
-        self.moveToClosestEdibleGhost = state[6]
-        self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint = state[7]
-        self.ghostOnClosestEdibleGhostDirectionPoint = state[8]
-        self.pacmanWithin1UnitOfGhostRespawn = state[9]
-        self.canMoveNorth = state[10]
-        self.canMoveWest = state[11]
-        self.canMoveSouth = state[12]
-        self.canMoveEast = state[13]
+        self.canMoveNorth = state[6]
+        self.canMoveWest = state[7]
+        self.canMoveSouth = state[8]
+        self.canMoveEast = state[9]
 
 # Some utility functions that I require, I am putting here
 def _getSuccessorsAtDepth(gameState, agentIndex, depth):

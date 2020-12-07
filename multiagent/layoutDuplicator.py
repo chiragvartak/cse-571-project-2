@@ -44,6 +44,17 @@ def generate(layoutName):
     layoutTFT = transpose(layoutTF)
     layoutTFTF = flip(layoutTFT)
 
+def stringOfNames(layoutNames):
+    stringOfNames = ""
+    for n in layoutNames:
+        generate(n)
+        stringOfNames += "%s-%sF-%sFT-%sFTF-%sT-%sTF-%sTFT-%sTFTF-" % (n, n, n, n, n, n, n, n)
+        n += "Capsule"
+        generate(n)
+        stringOfNames += "%s-%sF-%sFT-%sFTF-%sT-%sTF-%sTFT-%sTFTF-" % (n, n, n, n, n, n, n, n)
+
+    return stringOfNames[0:-1]
+
 if __name__ == '__main__':
     args = sys.argv[1:]
-    generate(args[0])
+    print(stringOfNames(args))

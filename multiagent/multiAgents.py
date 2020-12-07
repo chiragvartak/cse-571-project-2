@@ -408,6 +408,12 @@ class MCTSAgent(MultiAgentSearchAgent):
         max_nWins = max([actionTuple[2] for actionTuple in prunedActionTuples])
         prunedActionTuples = [actionTuple for actionTuple in prunedActionTuples if actionTuple[2] == max_nWins]
 
+        if max_nSimulations == 0:
+            print("mmhm")
+        
+        if max_nWins == 0:
+            print("uhg")
+
         # if there are still multiple elements with the max wins, pick randomly
         return random.choice(prunedActionTuples)[0]
 

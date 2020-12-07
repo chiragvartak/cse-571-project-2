@@ -5,17 +5,54 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "classic1Ghost 40",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallClassic1Ghost",
+                "-n",
+                "40"
+            ]
+        },
+        {
             "name": "LayoutGen",
             "type": "python",
             "request": "launch",
             "program": "layoutDuplicator.py",
             "console": "integratedTerminal",
             "args": [
-                "smallCapsule"
+                "corners",
+                "deadends",
+                "oneway",
+                "open",
+                "outsideCapsule",
+                "zigzag"
             ]
         },
         {
-            "name": "Train smallCapsules 10000",
+            "name": "Train SmallClassic 1000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "1000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallClassic1Ghost",
+                "-n",
+                "1020"
+            ]
+        },
+        {
+            "name": "Train Fast 10000",
             "type": "python",
             "request": "launch",
             "program": "pacman.py",
@@ -26,9 +63,9 @@
                 "-p",
                 "MCTSAgent",
                 "-l",
-                "smallCapsule-smallCapsuleF-smallCapsuleFT-smallCapsuleFTF-smallCapsuleT-smallCapsuleTF-smallCapsuleTFT-smallCapsuleTFTF",
+                "corners-cornersF-cornersFT-cornersFTF-cornersT-cornersTF-cornersTFT-cornersTFTF-cornersCapsule-cornersCapsuleF-cornersCapsuleFT-cornersCapsuleFTF-cornersCapsuleT-cornersCapsuleTF-cornersCapsuleTFT-cornersCapsuleTFTF-deadends-deadendsF-deadendsFT-deadendsFTF-deadendsT-deadendsTF-deadendsTFT-deadendsTFTF-deadendsCapsule-deadendsCapsuleF-deadendsCapsuleFT-deadendsCapsuleFTF-deadendsCapsuleT-deadendsCapsuleTF-deadendsCapsuleTFT-deadendsCapsuleTFTF-oneway-onewayF-onewayFT-onewayFTF-onewayT-onewayTF-onewayTFT-onewayTFTF-onewayCapsule-onewayCapsuleF-onewayCapsuleFT-onewayCapsuleFTF-onewayCapsuleT-onewayCapsuleTF-onewayCapsuleTFT-onewayCapsuleTFTF-open-openF-openFT-openFTF-openT-openTF-openTFT-openTFTF-openCapsule-openCapsuleF-openCapsuleFT-openCapsuleFTF-openCapsuleT-openCapsuleTF-openCapsuleTFT-openCapsuleTFTF-outsideCapsule-outsideCapsuleF-outsideCapsuleFT-outsideCapsuleFTF-outsideCapsuleT-outsideCapsuleTF-outsideCapsuleTFT-outsideCapsuleTFTF-outsideCapsuleCapsule-outsideCapsuleCapsuleF-outsideCapsuleCapsuleFT-outsideCapsuleCapsuleFTF-outsideCapsuleCapsuleT-outsideCapsuleCapsuleTF-outsideCapsuleCapsuleTFT-outsideCapsuleCapsuleTFTF-zigzag-zigzagF-zigzagFT-zigzagFTF-zigzagT-zigzagTF-zigzagTFT-zigzagTFTF-zigzagCapsule-zigzagCapsuleF-zigzagCapsuleFT-zigzagCapsuleFTF-zigzagCapsuleT-zigzagCapsuleTF-zigzagCapsuleTFT-zigzagCapsuleTFTF",
                 "-n",
-                "10010"
+                "10020"
             ]
         },
         {
