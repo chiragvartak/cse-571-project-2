@@ -383,8 +383,10 @@ class MCTSAgent(MultiAgentSearchAgent):
                 return fbgs.moveToClosestFood
             uctValues = self.getUCTValues(fbgs, commonModel)
             # print "uctValues", uctValues
-            actionToReturn = max(uctValues)[1]
-            return actionToReturn
+            # if there are multiple elements with the max value, pick randomly
+            max_value = max([uctValue[0] for uctValue in uctValues])
+            prunedUctValues = [uctValue for uctValue in uctValues if uctValue[0] == max_value]
+            return random.choice(prunedUctValues)[1]
         else:  # This is real game - do the best move!
             return self.realActionToTake(fbgs, commonModel)
 

@@ -15,11 +15,18 @@ class FeatureBasedGameState(object):
         # Please list all the features here. It becomes convenient; don't miss out any, or directly initialise elsewhere
         self.moveToClosestFood = None
         self.ghostWithin1UnitOfClosestFoodDirectionPoint = None
+        self.ghostOnClosestFoodDirectionPoint = None
         self.moveToClosestCapsule = None
         self.ghostWithin1UnitOfClosestCapsuleDirectionPoint = None
+        self.ghostOnClosestCapsuleDirectionPoint = None
         self.moveToClosestEdibleGhost = None
         self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint = None
+        self.ghostOnClosestEdibleGhostDirectionPoint = None
         self.pacmanWithin1UnitOfGhostRespawn = None
+        self.canMoveNorth = None
+        self.canMoveWest = None
+        self.canMoveSouth = None
+        self.canMoveEast = None
 
         # Caching some stuff for faster calculations - don't change this please!
         self.ghostStartPositions = None
@@ -33,15 +40,21 @@ class FeatureBasedGameState(object):
         self.sequenceOfMovesToClosestEdibleGhost = None
         self.ghostPositions = self.rawGameState.getGhostPositions()
 
-        # # This is where you will calculate the features you have listed above
+        # This is where you will calculate the features you have listed above
         self.moveToClosestFood = self.getMoveToClosestFood()
         self.ghostWithin1UnitOfClosestFoodDirectionPoint = self.isGhostWithin1UnitOfDirectionPoint(self.moveToClosestFood)
+        self.ghostOnClosestFoodDirectionPoint = self.isGhostOnDirectionPoint(self.moveToClosestFood)
         self.moveToClosestCapsule = self.getMoveToClosestCapsule()
         self.ghostWithin1UnitOfClosestCapsuleDirectionPoint = self.isGhostWithin1UnitOfDirectionPoint(self.moveToClosestCapsule)
+        self.ghostOnClosestCapsuleDirectionPoint = self.isGhostOnDirectionPoint(self.moveToClosestCapsule)
         self.moveToClosestEdibleGhost = self.getMoveToClosestEdibleGhost()
         self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint = self.isGhostWithin1UnitOfDirectionPoint(self.moveToClosestEdibleGhost)
+        self.ghostOnClosestEdibleGhostDirectionPoint = self.isGhostOnDirectionPoint(self.moveToClosestEdibleGhost)
         self.pacmanWithin1UnitOfGhostRespawn = self.isPacmanWithin1UnitOfGhostRespawn()
-        a=0
+        self.canMoveNorth = 'North' in self.rawGameState.getLegalPacmanActions()
+        self.canMoveWest = 'West' in self.rawGameState.getLegalPacmanActions()
+        self.canMoveSouth = 'South' in self.rawGameState.getLegalPacmanActions()
+        self.canMoveEast = 'East' in self.rawGameState.getLegalPacmanActions()
 
     def isGhostWithin1UnitOfDirectionPoint(self, directionPoint):
         if not directionPoint:
@@ -64,14 +77,45 @@ class FeatureBasedGameState(object):
         unscaredGhostStates = self.findUnscaredGhostStates()
         if unscaredGhostStates:
             unscaredGhostPositions = [state.getPosition() for state in self.findUnscaredGhostStates()]
-            # Check if ghost is present in any of the adjacent positions or at directionPoint itself
-            intersection = {(x, y), (x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)} & set(unscaredGhostPositions)
+            # Check if ghost is present in any of the adjacent positions
+            intersection = {(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)} & set(unscaredGhostPositions)
+        else:
+            unscaredGhostPositions = None
+            intersection = []
+        return len(intersection) > 0
+
+    def isGhostOnDirectionPoint(self, directionPoint):
+        if not directionPoint:
+            return None
+        x, y = self.rawGameState.getPacmanPosition()
+        closestFoodMovePoint = None
+        if directionPoint == "North":
+            closestFoodMovePoint = (x, y+1)
+        elif directionPoint == "South":
+            closestFoodMovePoint = (x, y-1)
+        elif directionPoint == "East":
+            closestFoodMovePoint = (x+1, y)
+        elif directionPoint == "West":
+            closestFoodMovePoint = (x-1, y)
+        else:
+            raise Exception("Invalid move " + str(directionPoint))
+
+        x, y = closestFoodMovePoint
+
+        unscaredGhostStates = self.findUnscaredGhostStates()
+        if unscaredGhostStates:
+            unscaredGhostPositions = [state.getPosition() for state in self.findUnscaredGhostStates()]
+            # Check if ghost is present on the direction point
+            intersection = {(x, y)} & set(unscaredGhostPositions)
         else:
             unscaredGhostPositions = None
             intersection = []
         return len(intersection) > 0
 
     def isPacmanWithin1UnitOfGhostRespawn(self):
+        # you should only care about this if there are scared ghosts at the moment
+        if not self.scaredGhosts:
+            return 0
         x, y = self.rawGameState.getPacmanPosition()
         intersection = {(x, y), (x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)} & set(self.findGhostStartPositions())
         return len(intersection) > 0
@@ -164,11 +208,18 @@ class FeatureBasedGameState(object):
         return (
             self.moveToClosestFood,
             self.ghostWithin1UnitOfClosestFoodDirectionPoint,
+            self.ghostOnClosestFoodDirectionPoint,
             self.moveToClosestCapsule,
             self.ghostWithin1UnitOfClosestCapsuleDirectionPoint,
+            self.ghostOnClosestCapsuleDirectionPoint,
             self.moveToClosestEdibleGhost,
             self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint,
-            self.pacmanWithin1UnitOfGhostRespawn
+            self.ghostOnClosestEdibleGhostDirectionPoint,
+            self.pacmanWithin1UnitOfGhostRespawn,
+            self.canMoveNorth,
+            self.canMoveWest,
+            self.canMoveSouth,
+            self.canMoveEast
             )
 
     def __hash__(self):
@@ -183,11 +234,18 @@ class FeatureBasedGameState(object):
         return str({
             "moveToClosestFood": self.moveToClosestFood,
             "ghostWithin1UnitOfClosestFoodDirectionPoint": self.ghostWithin1UnitOfClosestFoodDirectionPoint,
+            "ghostOnClosestFoodDirectionPoint": self.ghostOnClosestFoodDirectionPoint,
             "moveToClosestCapsule": self.moveToClosestCapsule,
             "ghostWithin1UnitOfClosestCapsuleDirectionPoint": self.ghostWithin1UnitOfClosestCapsuleDirectionPoint,
+            "ghostOnClosestCapsuleDirectionPoint": self.ghostOnClosestCapsuleDirectionPoint,
             "moveToClosestEdibleGhost": self.moveToClosestEdibleGhost,
             "ghostWithin1UnitOfClosestEdibleGhostDirectionPoint": self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint,
-            "pacmanWithin1UnitOfGhostRespawn": self.pacmanWithin1UnitOfGhostRespawn
+            "ghostOnClosestEdibleGhostDirectionPoint": self.ghostOnClosestEdibleGhostDirectionPoint,
+            "pacmanWithin1UnitOfGhostRespawn": self.pacmanWithin1UnitOfGhostRespawn,
+            "canMoveNorth": self.canMoveNorth,
+            "canMoveWest": self.canMoveWest,
+            "canMoveSouth": self.canMoveSouth,
+            "canMoveEast": self.canMoveEast
         })
 
     def getMoveToClosestFood(self):
@@ -227,27 +285,42 @@ class FeatureBasedGameState(object):
                 minDistance = len(sequenceOfActions)
                 moveToClosestEdibleGhost = sequenceOfActions[0]
 
+        self.moveToClosestEdibleGhost = moveToClosestEdibleGhost
         return moveToClosestEdibleGhost 
 
     def __getstate__(self):
         return (
             self.moveToClosestFood,
             self.ghostWithin1UnitOfClosestFoodDirectionPoint,
+            self.ghostOnClosestFoodDirectionPoint,
             self.moveToClosestCapsule,
             self.ghostWithin1UnitOfClosestCapsuleDirectionPoint,
+            self.ghostOnClosestCapsuleDirectionPoint,
             self.moveToClosestEdibleGhost,
             self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint,
-            self.pacmanWithin1UnitOfGhostRespawn
+            self.ghostOnClosestEdibleGhostDirectionPoint,
+            self.pacmanWithin1UnitOfGhostRespawn,
+            self.canMoveNorth,
+            self.canMoveWest,
+            self.canMoveSouth,
+            self.canMoveEast
             )
 
     def __setstate__(self, state):
         self.moveToClosestFood = state[0]
         self.ghostWithin1UnitOfClosestFoodDirectionPoint = state[1]
-        self.moveToClosestCapsule = state[2]
-        self.ghostWithin1UnitOfClosestCapsuleDirectionPoint = state[3]
-        self.moveToClosestEdibleGhost = state[4]
-        self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint = state[5]
-        self.pacmanWithin1UnitOfGhostRespawn = state[6]
+        self.ghostOnClosestFoodDirectionPoint = state[2]
+        self.moveToClosestCapsule = state[3]
+        self.ghostWithin1UnitOfClosestCapsuleDirectionPoint = state[4]
+        self.ghostOnClosestCapsuleDirectionPoint = state[5]
+        self.moveToClosestEdibleGhost = state[6]
+        self.ghostWithin1UnitOfClosestEdibleGhostDirectionPoint = state[7]
+        self.ghostOnClosestEdibleGhostDirectionPoint = state[8]
+        self.pacmanWithin1UnitOfGhostRespawn = state[9]
+        self.canMoveNorth = state[10]
+        self.canMoveWest = state[11]
+        self.canMoveSouth = state[12]
+        self.canMoveEast = state[13]
 
 # Some utility functions that I require, I am putting here
 def _getSuccessorsAtDepth(gameState, agentIndex, depth):

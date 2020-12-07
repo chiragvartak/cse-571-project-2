@@ -5,6 +5,40 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Train smallCapsules 10000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "10000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallCapsule-smallCapsuleT-smallCapsuleFlipped-smallCapsuleFlippedT",
+                "-n",
+                "10010"
+            ]
+        },
+        {
+            "name": "Train Many 10000",
+            "type": "python",
+            "request": "launch",
+            "program": "pacman.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--numTraining",
+                "10000",
+                "-p",
+                "MCTSAgent",
+                "-l",
+                "smallStandard-franksClassic-survival-survival2-testClassic-minimaxClassic-smallCapsule",
+                "-n",
+                "10010"
+            ]
+        },
+        {
             "name": "Train Robust 10000",
             "type": "python",
             "request": "launch",
@@ -12,13 +46,13 @@
             "console": "integratedTerminal",
             "args": [
                 "--numTraining",
-                "100",
+                "1000",
                 "-p",
                 "MCTSAgent",
                 "-l",
                 "smallRobust",
                 "-n",
-                "110"
+                "1010"
             ]
         },
         {
@@ -39,7 +73,7 @@
             ]
         },
         {
-            "name": "BigClassic 3",
+            "name": "BigClassic 10",
             "type": "python",
             "request": "launch",
             "program": "pacman.py",
@@ -50,7 +84,7 @@
                 "-l",
                 "BigClassic",
                 "-n",
-                "3"
+                "10"
             ]
         },
         {

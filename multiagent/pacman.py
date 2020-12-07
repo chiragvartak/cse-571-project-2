@@ -535,8 +535,11 @@ def readCommand( argv ):
     if options.fixRandomSeed: random.seed('cs188')
 
     # Choose a layout
-    args['layout'] = layout.getLayout( options.layout )
-    if args['layout'] == None: raise Exception("The layout " + options.layout + " cannot be found")
+    layouts = []
+    for layoutName in options.layout.split("-"):
+        layouts.append(layout.getLayout( layoutName ))
+    args['layoutList'] = layouts
+    if args['layoutList'] == None: raise Exception("The layouts " + options.layout + " cannot be found")
 
     # Choose a Pacman agent
     noKeyboard = options.gameToReplay == None and (options.textGraphics or options.quietGraphics)
@@ -627,7 +630,7 @@ def replayGame( layout, actions, display ):
 
     display.finish()
 
-def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0, catchExceptions=False, timeout=30 ):
+def runGames( layoutList, pacman, ghosts, display, numGames, record, numTraining = 0, catchExceptions=False, timeout=30 ):
     import __main__
     __main__.__dict__['_display'] = display
 
@@ -636,7 +639,10 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
 
     import time
     start_time = time.time()
+    numberOfLayouts = len(layoutList)
     for i in range( numGames ):
+        layout = layoutList[i%numberOfLayouts]
+
         beQuiet = i < numTraining
         if beQuiet:
                 # Suppress output and graphics
@@ -659,7 +665,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             cPickle.dump(components, f)
             f.close()
 
-        if (i+1)%10 == 0 and i < numTraining:
+        if (i+1)%100 == 0 and i < numTraining:
             sys.stdout.write("\rSimulations completed: %s" % str(i+1))
 
     if (numGames-numTraining) > 0:
